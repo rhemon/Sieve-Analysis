@@ -23,8 +23,7 @@ public class SieveAnalysisWindow extends JFrame{
 	 * cuPanel - the panel that will show the uniform coefficient
 	 */
 	JPanel headerPanel, dataPanel, fmPanel, graphPanel, cuPanel;
-	JLabel titleLabel, testMethodLabel, fromLabel, sampleLabel, totalWtTextLabel, totalWtLabel, fmLabel;
-	JTextField fromField, sampleField;
+	JLabel titleLabel, testMethodLabel, totalWtTextLabel, totalWtLabel, fmLabel;
 	Graphics graphArea;
 	SemiLogGraph SLG; 
 	// dataPanel is set as an [][]
@@ -180,10 +179,6 @@ public class SieveAnalysisWindow extends JFrame{
 		// set up for headerPanel
 		titleLabel = new JLabel("Sieve Analysis for Aggregate");
 		testMethodLabel = new JLabel("   Test Method ASTM C136");
-		fromLabel = new JLabel(" From : ");
-		sampleLabel = new JLabel("Sample No. : ");
-		fromField = new JTextField(10);
-		sampleField = new JTextField(5);
 		
 		headerPanel = new JPanel();
 		headerPanel.setLayout(new GridBagLayout());
@@ -194,15 +189,6 @@ public class SieveAnalysisWindow extends JFrame{
 		headerPanel.add(titleLabel, headerConstraints);
 		headerConstraints.gridy = 1;
 		headerPanel.add(testMethodLabel, headerConstraints);
-		headerConstraints.gridy = 2;
-		headerConstraints.gridx = 0;
-		headerPanel.add(fromLabel, headerConstraints);
-		headerConstraints.gridx = 1;
-		headerPanel.add(fromField, headerConstraints);
-		headerConstraints.gridx = 3;
-		headerPanel.add(sampleLabel, headerConstraints);
-		headerConstraints.gridx = 4;
-		headerPanel.add(sampleField, headerConstraints);
 		
 		BodyPanel.add(headerPanel, constraints);//, BorderLayout.PAGE_START);
 		
@@ -293,6 +279,10 @@ public class SieveAnalysisWindow extends JFrame{
 					
 					gui.setTitle("Sieve Analysis");
 					gui.setResizable(false);
+					Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+				    int x = (int) ((dimension.getWidth() - gui.getWidth()) / 2);
+				    int y = (int) ((dimension.getHeight() - gui.getHeight()) / 2);
+					gui.setLocation(x, y);;
 					gui.setVisible(true);
 					
 			    }

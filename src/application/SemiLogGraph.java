@@ -38,26 +38,26 @@ public class SemiLogGraph extends JPanel{
         // Logarithmic scaled X Lines  
         int at = 1;
         int scale = 1;
-        int startingPoint = 20;
+        int STARTPOINT = 20;
         int WIDTH = (GRAPHWIDTH/4);
         int XPOINT = 20;
         for (int i=0; i<4; i++) {
-        	int STARTPOINT = startingPoint;
             for (int j=0; j<9; j++) {
-            	XPOINT = STARTPOINT + (int) (Math.log10(at)*WIDTH); 
+            	XPOINT = STARTPOINT + (WIDTH - (int) (Math.log10(at)*WIDTH)); 
             	graphics.drawLine(XPOINT, YSTARTPOINT, XPOINT, YENDPOINT);
             	at += scale; 
             }
-            XPOINT = STARTPOINT + (int) (Math.log10(at)*WIDTH); 
+            XPOINT = STARTPOINT + (WIDTH - (int) (Math.log10(at)*WIDTH)); 
             g.setStroke(new BasicStroke(3));
             g.draw(new Line2D.Double(XPOINT, YSTARTPOINT, XPOINT, YENDPOINT));
             g.setStroke(new BasicStroke(0));
-        	startingPoint = XPOINT;
+            STARTPOINT += (int) Math.log10(10)*WIDTH;
+            System.out.println(STARTPOINT);
         	at = 1;
         }
         
         // Linear scaled Y Lines
-        startingPoint = 230;
+        int startingPoint = 230;
         double height = Math.round(GRAPHHEIGHT/10);
         double YPOINT = startingPoint;
     	g.setStroke(new BasicStroke(2));
@@ -65,7 +65,6 @@ public class SemiLogGraph extends JPanel{
         	YPOINT -= height;
         	g.draw(new Line2D.Double(20, YPOINT, 680, YPOINT));
         	at += scale;
-        	System.out.println(YPOINT);
         }
         g.setStroke(new BasicStroke(0));
        
