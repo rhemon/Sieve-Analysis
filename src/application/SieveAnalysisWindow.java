@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 
-@SuppressWarnings("serial")
-
 /*
  * This is the main class where the application for sieve analysis initiates
  * and takes launch  
  */
+@SuppressWarnings("serial")
 public class SieveAnalysisWindow extends JFrame{
+
 	/*
 	 * headerPanel - Will have title and text field for who its from, and sample no. 
 	 * dataPanel - the table for sieve analysis
