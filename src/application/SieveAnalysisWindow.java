@@ -23,11 +23,22 @@ public class SieveAnalysisWindow extends JFrame{
 	 * cuPanel - the panel that will show the uniform coefficient
 	 */
 	JPanel headerPanel, dataPanel, fmPanel, graphPanel, cuPanel;
-	JLabel titleLabel, testMethodLabel, totalWtTextLabel, totalWtLabel, fmLabel;
+	JLabel titleLabel, testMethodLabel, totalWtTextLabel, totalWtLabel, fmLabel, d60Label, d10Label, cuLabel;
 	Graphics graphArea;
 	SemiLogGraph SLG; 
 	// dataPanel is set as an [][]
 	ArrayList<ArrayList<Object>> sieveData; //needs to be set properly with JLabel, JTextField
+	// xCoordinates and yCoordinates 
+	double[] xCords = {
+		4.750,
+		2.360,
+		1.180,
+		0.600,
+		0.300,
+		0.150,
+		0.075
+	};
+	double[] yCords = new double[7];
 	
 	// button which when pressed will indicate all data required is entered
 	JButton submitButton;
@@ -151,7 +162,9 @@ public class SieveAnalysisWindow extends JFrame{
 			
 			cumulativePercent[j-1] = SieveAnalysisCalc.CaclCumulativePercentRetained(percentRt);
 			percentFiner = SieveAnalysisCalc.CalcPercentFiner(cumulativePercent[j-1]);
-			
+			if ((j-1) < 7) {
+				yCords[j-1] = percentFiner;
+			}
 			
 			cumulativePercentLabel.setText(String.format("%.2f", cumulativePercent[j-1]));
 			percentFinerLabel.setText(String.format("%.2f", percentFiner));
@@ -161,6 +174,8 @@ public class SieveAnalysisWindow extends JFrame{
 		totalWtLabel.setText(String.format("%.2f", totalWt));
 		double finenessModulus = SieveAnalysisCalc.CalcFinenessModulus(Arrays.copyOfRange(cumulativePercent, 0, 6));
 		fmLabel.setText("Fineness Modulus : " + String.format("%.2f", finenessModulus));
+		
+		SLG.repaint(xCords, yCords, d60Label, d10Label, cuLabel);
 		
 	}
 	
@@ -190,6 +205,7 @@ public class SieveAnalysisWindow extends JFrame{
 		headerConstraints.gridy = 1;
 		headerPanel.add(testMethodLabel, headerConstraints);
 		
+		// adding header panel to body
 		BodyPanel.add(headerPanel, constraints);//, BorderLayout.PAGE_START);
 		
 		// set up for dataPanel
@@ -234,6 +250,7 @@ public class SieveAnalysisWindow extends JFrame{
 		dataConstraints.gridy = 0;		
 		dataPanel.add(fmLabel, dataConstraints);
 		
+		// adding data panel to body
 		constraints.gridy = 1;
 		BodyPanel.add(dataPanel, constraints);//, BorderLayout.CENTER);
 		
@@ -244,23 +261,28 @@ public class SieveAnalysisWindow extends JFrame{
 		SLG = new SemiLogGraph();
 		graphPanel.add(SLG);
 		
+		// set up for cuPanel
 		cuPanel = new JPanel();
-		cuPanel.setLayout(new FlowLayout());
-		JLabel cuLabel = new JLabel("Uniform Coefficient (D60/D10)");
-		cuPanel.add(cuLabel);
+		cuPanel.setLayout(new GridBagLayout());
+		GridBagConstraints cuConstraints = new GridBagConstraints();
+		cuConstraints.fill = GridBagConstraints.HORIZONTAL;
+		cuConstraints.gridx = 0;
+		cuConstraints.ipady = 2;
+		cuConstraints.gridy = 0;
+		d60Label = new JLabel("D60 : ");
+		cuPanel.add(d60Label, cuConstraints);
+		cuConstraints.gridy = 1;
+		d10Label = new JLabel("D10 : ");// + String.format("%.2f", SLG.D10));
+		cuPanel.add(d10Label, cuConstraints);
+		cuConstraints.gridy = 2;
+		cuLabel = new JLabel("Uniform Coefficient (D60/D10) = ");// + String.format("%.2f", SieveAnalysisCalc.CalcUniformityCoefficient(SLG.D60, SLG.D10)));
+		cuPanel.add(cuLabel, cuConstraints);
 		graphPanel.add(cuPanel);
 		
+		// adding graph panel to body
 		constraints.gridy = 2;
 		BodyPanel.add(graphPanel, constraints);
-		
-		// ------------------------
-		// set up for graphPanel  -
-		//						  -
-		// set up for cuPanel	  -
-		// ------------------------
-		
 		BodyPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		
 		add(BodyPanel);
 		
 	}
