@@ -3,6 +3,7 @@ package application;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +23,7 @@ public class SieveAnalysisWindow extends JFrame{
 	 * graphPanel - the panel that will show the semi-log graph
 	 * cuPanel - the panel that will show the uniform coefficient
 	 */
-	JPanel headerPanel, dataPanel, fmPanel, graphPanel, cuPanel;
+	JPanel headerPanel, dataPanel, fmPanel, graphPanel, cuPanel, graphBox;
 	JLabel titleLabel, testMethodLabel, totalWtTextLabel, totalWtLabel, fmLabel, d60Label, d10Label, cuLabel;
 	Graphics graphArea;
 	SemiLogGraph SLG; 
@@ -258,8 +259,53 @@ public class SieveAnalysisWindow extends JFrame{
 		graphPanel = new JPanel();
 		graphPanel.setLayout(new FlowLayout());
 		
+		graphBox = new JPanel();
+		graphBox.setLayout(new GridBagLayout());
+		GridBagConstraints boxConstraints = new GridBagConstraints();
+		
+		boxConstraints.fill = GridBagConstraints.CENTER;
+		boxConstraints.gridx = 1;
+		boxConstraints.gridy = 0;
+		boxConstraints.ipadx = 2;
+		boxConstraints.ipady = 2;
+		JLabel graphTitle = new JLabel("Grain Size Distribution");
+		graphTitle.setAlignmentX(CENTER_ALIGNMENT);
+		graphBox.add(graphTitle, boxConstraints);
+		
+		boxConstraints.fill = GridBagConstraints.HORIZONTAL;
+		boxConstraints.gridy=1;
+		boxConstraints.gridx=0;
+		JLabel yLabel = new JLabel("Percent Finer") {
+			protected void paintComponent(Graphics g) {
+				Graphics2D g2 = (Graphics2D)g;
+	            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+	                                RenderingHints.VALUE_ANTIALIAS_ON);
+	            AffineTransform aT = g2.getTransform();
+	            Shape oldshape = g2.getClip();
+	            double x = 65;
+	            double y = 0;
+	            aT.rotate(Math.toRadians(270), x, y);
+//	            g2.transform(aT);
+	            g2.setTransform(aT);
+	            g2.setClip(oldshape);
+	            super.paintComponent(g);
+			}
+		};
+		
+		graphBox.add(yLabel, boxConstraints);
+		boxConstraints.gridx=1;
 		SLG = new SemiLogGraph();
-		graphPanel.add(SLG);
+		graphBox.add(SLG, boxConstraints);
+		
+		boxConstraints.fill = GridBagConstraints.CENTER;
+		boxConstraints.gridy=2;
+		boxConstraints.gridx=1;
+		JLabel xLabel = new JLabel("Diameter (mm)");
+		xLabel.setAlignmentX(CENTER_ALIGNMENT);
+		graphBox.add(xLabel, boxConstraints);
+		
+		graphPanel.add(graphBox);
+		
 		
 		// set up for cuPanel
 		cuPanel = new JPanel();

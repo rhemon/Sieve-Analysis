@@ -26,10 +26,14 @@ public class SemiLogGraph extends JPanel{
     public void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);       
         Graphics2D g = (Graphics2D) graphics;
+
+        g.setFont(new Font("TimesRoman", Font.BOLD, 10));
         // Draw Text
         g.setStroke(new BasicStroke(3));
         g.draw(new Line2D.Double(20, 20, 20, 230));
         g.draw(new Line2D.Double(20, 230, 680, 230));
+        g.drawString("10", 20-5, 245);
+        g.drawString("0", 4, 230+5);
         g.setStroke(new BasicStroke(0));
         // Loop to draw the scaled graph
         final int XSTARTPOINT = 20;
@@ -45,6 +49,7 @@ public class SemiLogGraph extends JPanel{
         int STARTPOINTX = 20;
         int WIDTH = (GRAPHWIDTH/4);
         int XPOINT = 20;
+        double value = 10;
         for (int i=0; i<4; i++) {
         	g.setColor(Color.GRAY);
             for (int j=0; j<9; j++) {
@@ -55,6 +60,10 @@ public class SemiLogGraph extends JPanel{
             XPOINT = STARTPOINTX + (WIDTH - (int) (Math.log10(at)*WIDTH)); 
             g.setStroke(new BasicStroke(3));
             g.setColor(Color.BLACK);
+            if (i > 0){
+	            value /= 10;
+	            g.drawString(Double.toString(value), (int) XPOINT-5, 245);
+            }
             g.draw(new Line2D.Double(XPOINT, YSTARTPOINT, XPOINT, YENDPOINT));
             g.setStroke(new BasicStroke(0));
             STARTPOINTX += (int) Math.log10(10)*WIDTH;
@@ -65,11 +74,14 @@ public class SemiLogGraph extends JPanel{
         int STARTPOINTY = 230;
         double height = Math.round(GRAPHHEIGHT/10);
         double YPOINT = STARTPOINTY;
+        int valueY = 0;
     	g.setStroke(new BasicStroke(2));
     	g.setColor(Color.GRAY);
         for (int i = 0; i<10; i++) {
         	YPOINT -= height;
+        	valueY += 10;
         	g.draw(new Line2D.Double(20, YPOINT, 680, YPOINT));
+        	g.drawString(Integer.toString(valueY), 4, (int) YPOINT+5); 
         	at += scale;
         }
         g.setStroke(new BasicStroke(0));
@@ -141,7 +153,7 @@ public class SemiLogGraph extends JPanel{
     				
     				d60.setText("D60 : " + String.format("%.2f", D60));
     				d10.setText("D10 : "+ String.format("%.2f", D10));
-    				cu.setText("Uniform Coefficient (D60/D10) = " + String.format("%.2f", SieveAnalysisCalc.CalcUniformityCoefficient(D60, D10)));
+    				cu.setText("Uniform Coefficient (D60/D10) = " + String.format("%.2f", SieveAnalysisCalc.CalcUniformityCoefficient(Double.parseDouble(String.format("%.2f", D60)),Double.parseDouble(String.format("%.2f", D10)))));
     		        
         		}
         		
