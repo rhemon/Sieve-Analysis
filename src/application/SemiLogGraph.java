@@ -16,26 +16,27 @@ public class SemiLogGraph extends JPanel{
 	
 	public SemiLogGraph() {
         setBorder(BorderFactory.createLineBorder(Color.black));
-        
     }
-//
+	
     public Dimension getPreferredSize() {
         return new Dimension(700, 250);
     }
 
     public void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);       
+        
         Graphics2D g = (Graphics2D) graphics;
-
         g.setFont(new Font("TimesRoman", Font.BOLD, 10));
-        // Draw Text
+        
+        // Draws the Axis and 
         g.setStroke(new BasicStroke(3));
         g.draw(new Line2D.Double(20, 20, 20, 230));
         g.draw(new Line2D.Double(20, 230, 680, 230));
         g.drawString("10", 20-5, 245);
         g.drawString("0", 4, 230+5);
         g.setStroke(new BasicStroke(0));
-        // Loop to draw the scaled graph
+        
+        // constant variables about graph
         final int XSTARTPOINT = 20;
         final int XENDPOINT = 680;
         final int YSTARTPOINT = 20;
@@ -85,6 +86,7 @@ public class SemiLogGraph extends JPanel{
         	at += scale;
         }
         g.setStroke(new BasicStroke(0));
+        
         
         // Plotting Values
         g.setStroke(new BasicStroke(2));

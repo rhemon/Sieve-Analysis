@@ -64,7 +64,7 @@ public class SieveAnalysisWindow extends JFrame{
 	// Screen Informations 
 	static double x, y, width, height;
 	
-	// private function for setting up sieve data
+	// private function for setting up sieve data array
 	private void setUpData() {
 		sieveData = new ArrayList<ArrayList<Object>>();
 		
@@ -223,7 +223,7 @@ public class SieveAnalysisWindow extends JFrame{
 		headerPanel.add(testMethodLabel, headerConstraints);
 		
 		// adding header panel to body
-		BodyPanel.add(headerPanel, constraints);//, BorderLayout.PAGE_START);
+		BodyPanel.add(headerPanel, constraints);
 		
 		// set up for dataPanel
 		dataPanel = new JPanel();
@@ -275,7 +275,7 @@ public class SieveAnalysisWindow extends JFrame{
 		
 		// adding data panel to body
 		constraints.gridy = 1;
-		BodyPanel.add(dataPanel, constraints);//, BorderLayout.CENTER);
+		BodyPanel.add(dataPanel, constraints);
 		
 		// set up for graphPanel;
 		graphPanel = new JPanel();
@@ -299,8 +299,10 @@ public class SieveAnalysisWindow extends JFrame{
 		boxConstraints.fill = GridBagConstraints.HORIZONTAL;
 		boxConstraints.gridy=1;
 		boxConstraints.gridx=0;
+		
 		JLabel yLabel = new JLabel("Percent Finer") {
 			protected void paintComponent(Graphics g) {
+				// Rotating the y-axis label
 				Graphics2D g2 = (Graphics2D)g;
 	            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 	                                RenderingHints.VALUE_ANTIALIAS_ON);
@@ -309,7 +311,6 @@ public class SieveAnalysisWindow extends JFrame{
 	            double x = 65;
 	            double y = 0;
 	            aT.rotate(Math.toRadians(270), x, y);
-//	            g2.transform(aT);
 	            g2.setTransform(aT);
 	            g2.setClip(oldshape);
 	            super.paintComponent(g);
@@ -320,7 +321,7 @@ public class SieveAnalysisWindow extends JFrame{
 		boxConstraints.gridx=1;
 		SLG = new SemiLogGraph();
 		SLG.setBackground(Color.WHITE);
-		graphBox.add(SLG, boxConstraints);
+		graphBox.add(SLG, boxConstraints); // graph added to graph box
 		
 		boxConstraints.fill = GridBagConstraints.CENTER;
 		boxConstraints.gridy=2;
@@ -329,6 +330,7 @@ public class SieveAnalysisWindow extends JFrame{
 		xLabel.setAlignmentX(CENTER_ALIGNMENT);
 		graphBox.add(xLabel, boxConstraints);
 		
+		// graph box added to graph panel
 		graphPanel.add(graphBox);
 		
 		
@@ -344,10 +346,10 @@ public class SieveAnalysisWindow extends JFrame{
 		d60Label = new JLabel("D60 : ");
 		cuPanel.add(d60Label, cuConstraints);
 		cuConstraints.gridy = 1;
-		d10Label = new JLabel("D10 : ");// + String.format("%.2f", SLG.D10));
+		d10Label = new JLabel("D10 : ");
 		cuPanel.add(d10Label, cuConstraints);
 		cuConstraints.gridy = 2;
-		cuLabel = new JLabel("Uniform Coefficient (D60/D10) = ");// + String.format("%.2f", SieveAnalysisCalc.CalcUniformityCoefficient(SLG.D60, SLG.D10)));
+		cuLabel = new JLabel("Uniform Coefficient (D60/D10) = ");
 		cuPanel.add(cuLabel, cuConstraints);
 		graphPanel.add(cuPanel);
 		
@@ -355,15 +357,18 @@ public class SieveAnalysisWindow extends JFrame{
 		constraints.gridy = 2;
 		BodyPanel.add(graphPanel, constraints);
 		
+		// set up for error label 
 		errorLabel = new JLabel("");
 		constraints.gridx=0;
 		constraints.gridy=3;
+		// adding error label to body
 		BodyPanel.add(errorLabel, constraints);
 		
 		BodyPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		BodyPanel.setBackground(Color.WHITE);
-		add(BodyPanel);
+		add(BodyPanel); //body panel added to frame
 		
+		// setting up menu bar
 		mainMenu = new JMenuBar();
 		file = new JMenu("File");
 		export = new JMenuItem("Export as Image");
@@ -396,6 +401,12 @@ public class SieveAnalysisWindow extends JFrame{
 		
 	}
 	
+	// saves image
+	/**
+	 * Saves the screenshot taken
+	 * @param screenShot The screenshot that was taken
+	 * @param print      Should it print or not
+	 */
 	private void saveImage(BufferedImage screenShot, boolean print) {
 		JFileChooser fs = new JFileChooser(new File("."));
 		fs.setDialogTitle("Export Image (Please enter name)");
@@ -405,6 +416,8 @@ public class SieveAnalysisWindow extends JFrame{
 			String fileExtension = "jpg";
 			try {
 				String pathName = fi.getPath();
+				// checks if any extension is given in the name, if it is then arranges the name according to it, and if invalid extension given
+				// informs the user
 				if (fi.getName().contains(".")){
 					int numberOfOccurences =0;
 					for (int i=0; i<fi.getName().length(); i++){
@@ -434,6 +447,11 @@ public class SieveAnalysisWindow extends JFrame{
 		}
 	}
 	
+	// prints image
+	/**
+	 * Functions prints the image using PrinterJob
+	 * @param file image file 
+	 */
 	private void printImage(File file) {
 		PrinterJob job = PrinterJob.getPrinterJob();
 		PageFormat pf = job.defaultPage();
@@ -469,18 +487,19 @@ public class SieveAnalysisWindow extends JFrame{
 	    	  JOptionPane.showMessageDialog(this,
 					    "Error : " + ex.getMessage(),
 					    "Print Error!!!",
-					    JOptionPane.ERROR_MESSAGE);
-	    	  
+					    JOptionPane.ERROR_MESSAGE);	  
 	      }
 	    }
-	    
-		
 	}
 	
+	// function takes screen shot 
+	/**
+	 * Takes a screenshot of the application
+	 * @param print should it print or not 
+	 */
 	private void takeScreenShot(boolean print) {
 		x = this.getLocation().getX();
 		y = this.getLocation().getY();
-		
 		
 		Robot robot;
 		try {
@@ -496,15 +515,12 @@ public class SieveAnalysisWindow extends JFrame{
 				    JOptionPane.ERROR_MESSAGE);
 		}
 		
-		
-		
 	}
-//	
+
 	// Launcher (main) function
 	public static void main(String[] args) {
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
-
 			    @Override
 			    public void run() {
 			        final JFrame gui = new SieveAnalysisWindow();
@@ -513,14 +529,16 @@ public class SieveAnalysisWindow extends JFrame{
 					gui.setBackground(Color.WHITE);
 					gui.setTitle("Sieve Analysis");
 					gui.setResizable(false);
+					
+					// locating the window in the center of the screen
 					Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 				    x = (double) ((dimension.getWidth() - gui.getWidth()) / 2);
 				    y = (double) ((dimension.getHeight() - gui.getHeight()) / 2);
 				    width = (double) gui.getWidth();
 				    height = (double) gui.getHeight();
-					gui.setLocation((int)x, (int) y);;
-					gui.setVisible(true);
+					gui.setLocation((int)x, (int) y);
 					
+					gui.setVisible(true);
 			    }
 			});
 		} catch (InvocationTargetException e) {
@@ -535,5 +553,4 @@ public class SieveAnalysisWindow extends JFrame{
 				    JOptionPane.ERROR_MESSAGE);
 		}
 	}
-	
 }
