@@ -461,13 +461,12 @@ public class SieveAnalysisWindow extends JFrame{
 
 			@Override
 			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-				// TODO Auto-generated method stub
 				if (pageIndex > 0) // we only print one page
 		            return Printable.NO_SUCH_PAGE; // ie., end of job
 				Image image;
 				try {
 					image = ImageIO.read((File) file);
-					graphics.drawImage(image, 10, 30, (int)pf.getWidth()-15, (int)pf.getHeight()-40, null);// Graphics.class.VCENTER | Graphics.HCENTER)
+					graphics.drawImage(image, 10, 30, (int)pf.getWidth()-25, (int)pf.getHeight()-40, null);// Graphics.class.VCENTER | Graphics.HCENTER)
 					
 				} catch (IOException e) {
 					return Printable.NO_SUCH_PAGE;
