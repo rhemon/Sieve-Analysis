@@ -1,9 +1,17 @@
 package application;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,9 +32,17 @@ public class SieveAnalysisWindow extends JFrame{
 	 * cuPanel - the panel that will show the uniform coefficient
 	 */
 	JPanel headerPanel, dataPanel, fmPanel, graphPanel, cuPanel, graphBox;
-	JLabel titleLabel, testMethodLabel, totalWtTextLabel, totalWtLabel, fmLabel, d60Label, d10Label, cuLabel;
-	Graphics graphArea;
+	JLabel titleLabel, testMethodLabel, totalWtTextLabel, totalWtLabel, fmLabel, d60Label, d10Label, cuLabel, errorLabel;
+	
+	// Menu bar, menu, menu item variable declaration 
+	JMenuBar mainMenu;
+	JMenu file;
+	JMenuItem export, exportAndPrint;
+	
+	//TODO: Add a menu item for exporting to spreadsheet and printing that
+	
 	SemiLogGraph SLG; 
+	
 	// dataPanel is set as an [][]
 	ArrayList<ArrayList<Object>> sieveData; //needs to be set properly with JLabel, JTextField
 	// xCoordinates and yCoordinates 
@@ -44,11 +60,9 @@ public class SieveAnalysisWindow extends JFrame{
 	// button which when pressed will indicate all data required is entered
 	JButton submitButton;
 	
-	// TODO will add a export button which will export all data (given and calculated) into a csv file, for later use 
-	// JButton exportButton; 
-	// TODO will add a import button which will collect data from a csv file
-	// JButton importButton
-	// The above could also be set as menu options 
+	
+	// Screen Informations 
+	static double x, y, width, height;
 	
 	// private function for setting up sieve data
 	private void setUpData() {
@@ -138,7 +152,7 @@ public class SieveAnalysisWindow extends JFrame{
 	}
 	
 	// Updates data on submit 
-	private void updateData() {
+	private void updateData() throws Exception{
 		double weightRetainedValues[] = new double[sieveData.size()-1], totalWt = 0;
 		int j = 0;
 		for (int i = 1; i < sieveData.size(); i++) {
@@ -177,6 +191,7 @@ public class SieveAnalysisWindow extends JFrame{
 		fmLabel.setText("Fineness Modulus : " + String.format("%.2f", finenessModulus));
 		
 		SLG.repaint(xCords, yCords, d60Label, d10Label, cuLabel);
+		errorLabel.setText("");
 		
 	}
 	
@@ -197,6 +212,7 @@ public class SieveAnalysisWindow extends JFrame{
 		testMethodLabel = new JLabel("   Test Method ASTM C136");
 		
 		headerPanel = new JPanel();
+		headerPanel.setBackground(Color.WHITE);
 		headerPanel.setLayout(new GridBagLayout());
 		GridBagConstraints headerConstraints = new GridBagConstraints();
 		headerConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -212,6 +228,7 @@ public class SieveAnalysisWindow extends JFrame{
 		// set up for dataPanel
 		dataPanel = new JPanel();
 		dataPanel.setLayout(new GridBagLayout());
+		dataPanel.setBackground(Color.WHITE);
 		GridBagConstraints dataConstraints = new GridBagConstraints();
 		dataConstraints.fill = GridBagConstraints.HORIZONTAL;
 		dataConstraints.gridx = 0;
@@ -232,7 +249,12 @@ public class SieveAnalysisWindow extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				updateData();
+				try {
+					updateData();
+				} catch (Exception exception) {
+					errorLabel.setForeground(Color.RED);
+					errorLabel.setText("Please ensure valid date is entered");
+				}
 			}
 			
 		});
@@ -257,9 +279,11 @@ public class SieveAnalysisWindow extends JFrame{
 		
 		// set up for graphPanel;
 		graphPanel = new JPanel();
+		graphPanel.setBackground(Color.WHITE);
 		graphPanel.setLayout(new FlowLayout());
 		
 		graphBox = new JPanel();
+		graphBox.setBackground(Color.WHITE);
 		graphBox.setLayout(new GridBagLayout());
 		GridBagConstraints boxConstraints = new GridBagConstraints();
 		
@@ -295,6 +319,7 @@ public class SieveAnalysisWindow extends JFrame{
 		graphBox.add(yLabel, boxConstraints);
 		boxConstraints.gridx=1;
 		SLG = new SemiLogGraph();
+		SLG.setBackground(Color.WHITE);
 		graphBox.add(SLG, boxConstraints);
 		
 		boxConstraints.fill = GridBagConstraints.CENTER;
@@ -309,6 +334,7 @@ public class SieveAnalysisWindow extends JFrame{
 		
 		// set up for cuPanel
 		cuPanel = new JPanel();
+		cuPanel.setBackground(Color.WHITE);
 		cuPanel.setLayout(new GridBagLayout());
 		GridBagConstraints cuConstraints = new GridBagConstraints();
 		cuConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -328,12 +354,152 @@ public class SieveAnalysisWindow extends JFrame{
 		// adding graph panel to body
 		constraints.gridy = 2;
 		BodyPanel.add(graphPanel, constraints);
+		
+		errorLabel = new JLabel("");
+		constraints.gridx=0;
+		constraints.gridy=3;
+		BodyPanel.add(errorLabel, constraints);
+		
 		BodyPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		BodyPanel.setBackground(Color.WHITE);
 		add(BodyPanel);
+		
+		mainMenu = new JMenuBar();
+		file = new JMenu("File");
+		export = new JMenuItem("Export as Image");
+		export.addActionListener(new ActionListener(){
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				takeScreenShot(false);
+				
+			}
+			
+		});
+		
+		exportAndPrint = new JMenuItem("Export and Print");
+		exportAndPrint.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				takeScreenShot(true);
+			}
+			
+		});
+		
+		file.add(export);
+		file.add(exportAndPrint);
+		mainMenu.add(file);
+		setJMenuBar(mainMenu);
 		
 	}
 	
+	private void saveImage(BufferedImage screenShot, boolean print) {
+		JFileChooser fs = new JFileChooser(new File("."));
+		fs.setDialogTitle("Export Image (Please enter name)");
+		int result = fs.showSaveDialog(null);
+		if (result == JFileChooser.APPROVE_OPTION) {
+			File fi = fs.getSelectedFile();
+			String fileExtension = "jpg";
+			try {
+				String pathName = fi.getPath();
+				if (fi.getName().contains(".")){
+					int numberOfOccurences =0;
+					for (int i=0; i<fi.getName().length(); i++){
+						if (fi.getName().charAt(i) == '.'){
+							numberOfOccurences++;
+						}
+					}
+					if (numberOfOccurences>1) {
+						throw new Exception();
+					} 
+					
+					fileExtension = fi.getName().substring(fi.getName().indexOf(".")+1, fi.getName().length());// continue here
+					pathName = fi.getPath().substring(0, fi.getPath().length()-fileExtension.length()-1);
+					
+				}
+				File imageFile = new File(pathName+"."+fileExtension);
+				ImageIO.write(screenShot, fileExtension, imageFile);
+				if (print) {
+					printImage(imageFile);
+				}
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(fs,
+					    "File Name extension cant be recongnized",
+					    "Export Error!!!",
+					    JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
 	
+	private void printImage(File file) {
+		PrinterJob job = PrinterJob.getPrinterJob();
+		PageFormat pf = job.defaultPage();
+		pf.setOrientation(PageFormat.LANDSCAPE);
+		
+		Printable painter = new Printable(){
+
+			@Override
+			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+				// TODO Auto-generated method stub
+				if (pageIndex > 0) // we only print one page
+		            return Printable.NO_SUCH_PAGE; // ie., end of job
+				Image image;
+				try {
+					image = ImageIO.read((File) file);
+					graphics.drawImage(image, 10, 30, (int)pf.getWidth()-15, (int)pf.getHeight()-40, null);// Graphics.class.VCENTER | Graphics.HCENTER)
+					
+				} catch (IOException e) {
+					return Printable.NO_SUCH_PAGE;
+				}
+				return Printable.PAGE_EXISTS;
+			}
+			
+		};
+		
+	    job.setPrintable(painter, pf);
+	    boolean ok = job.printDialog();
+	    if (ok) {
+	      try {
+	    	  job.print();
+	      } catch (PrinterException ex) {
+	        /* The job did not successfully complete */
+	    	  JOptionPane.showMessageDialog(this,
+					    "Error : " + ex.getMessage(),
+					    "Print Error!!!",
+					    JOptionPane.ERROR_MESSAGE);
+	    	  
+	      }
+	    }
+	    
+		
+	}
+	
+	private void takeScreenShot(boolean print) {
+		x = this.getLocation().getX();
+		y = this.getLocation().getY();
+		
+		
+		Robot robot;
+		try {
+			robot = new Robot();
+			Rectangle rect = new Rectangle((int)width-23,(int)height-112);
+			rect.setLocation((int)x+20, (int)y+95);
+			BufferedImage screenShot = robot.createScreenCapture(rect);
+			saveImage(screenShot, print);
+		} catch (AWTException e) {
+			JOptionPane.showMessageDialog(this,
+				    "Error : " + e.getMessage(),
+				    "Error!!!",
+				    JOptionPane.ERROR_MESSAGE);
+		}
+		
+		
+		
+	}
+//	
 	// Launcher (main) function
 	public static void main(String[] args) {
 		try {
@@ -344,23 +510,29 @@ public class SieveAnalysisWindow extends JFrame{
 			        final JFrame gui = new SieveAnalysisWindow();
 			        gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 					gui.pack();
-					
+					gui.setBackground(Color.WHITE);
 					gui.setTitle("Sieve Analysis");
 					gui.setResizable(false);
 					Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-				    int x = (int) ((dimension.getWidth() - gui.getWidth()) / 2);
-				    int y = (int) ((dimension.getHeight() - gui.getHeight()) / 2);
-					gui.setLocation(x, y);;
+				    x = (double) ((dimension.getWidth() - gui.getWidth()) / 2);
+				    y = (double) ((dimension.getHeight() - gui.getHeight()) / 2);
+				    width = (double) gui.getWidth();
+				    height = (double) gui.getHeight();
+					gui.setLocation((int)x, (int) y);;
 					gui.setVisible(true);
 					
 			    }
 			});
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(new JFrame(),
+				    "Error : " + e.getMessage(),
+				    "Error!!!",
+				    JOptionPane.ERROR_MESSAGE);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(new JFrame(),
+				    "Error : " + e.getMessage(),
+				    "Error!!!",
+				    JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
