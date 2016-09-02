@@ -60,7 +60,6 @@ public class SieveAnalysisWindow extends JFrame{
 	// button which when pressed will indicate all data required is entered
 	JButton submitButton;
 	
-	
 	// Screen Informations 
 	static double x, y, width, height;
 	
@@ -372,13 +371,12 @@ public class SieveAnalysisWindow extends JFrame{
 		mainMenu = new JMenuBar();
 		file = new JMenu("File");
 		export = new JMenuItem("Export as Image");
+		
 		export.addActionListener(new ActionListener(){
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
 				takeScreenShot(false);
-				
 			}
 			
 		});
@@ -388,8 +386,7 @@ public class SieveAnalysisWindow extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
-				takeScreenShot(true);
+				takeScreenShot(true);		
 			}
 			
 		});
@@ -407,6 +404,8 @@ public class SieveAnalysisWindow extends JFrame{
 	 * @param screenShot The screenshot that was taken
 	 * @param print      Should it print or not
 	 */
+	
+	
 	private void saveImage(BufferedImage screenShot, boolean print) {
 		JFileChooser fs = new JFileChooser(new File("."));
 		fs.setDialogTitle("Export Image (Please enter name)");
