@@ -9,3 +9,7 @@ This application also allows to print, but at the moment it only takes a screens
 of the application and exports it as a image file, and prints that.
 <br/>
 <img src="./menu.png">
+<br/>
+<br/>
+Exported image, looks like this:
+<br/> <img src="TestExport.jpg">
