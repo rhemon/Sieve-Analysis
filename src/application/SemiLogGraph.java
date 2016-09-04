@@ -2,7 +2,6 @@ package application;
 
 import java.awt.*;
 import java.awt.geom.Line2D;
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -13,10 +12,6 @@ public class SemiLogGraph extends JPanel{
 	private double[] xCoordinates, yCoordinates;
 	private double D60, D10;
 	JLabel d60, d10, cu;
-	
-	public SemiLogGraph() {
-        setBorder(BorderFactory.createLineBorder(Color.black));
-    }
 	
     public Dimension getPreferredSize() {
         return new Dimension(700, 250);
